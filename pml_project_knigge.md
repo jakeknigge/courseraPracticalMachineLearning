@@ -122,6 +122,25 @@ rfFit <- train(x = training1[, 1:32],
                ntree = 250,
                prox = TRUE,
                allowParallel = TRUE)
+rfFit$finalModel
+```
+
+```
+## 
+## Call:
+##  randomForest(x = x, y = y, ntree = 250, mtry = param$mtry, proximity = TRUE,      data = ..1, allowParallel = TRUE) 
+##                Type of random forest: classification
+##                      Number of trees: 250
+## No. of variables tried at each split: 2
+## 
+##         OOB estimate of  error rate: 0.87%
+## Confusion matrix:
+##      A    B    C    D    E class.error
+## A 3898    2    4    2    0 0.002048131
+## B   18 2631    8    0    1 0.010158014
+## C    1   17 2368   10    0 0.011686144
+## D    0    1   40 2211    0 0.018206039
+## E    1    0    5   10 2509 0.006336634
 ```
 
 ### Random forest history and reference

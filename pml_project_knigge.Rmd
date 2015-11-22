@@ -100,6 +100,7 @@ rfFit <- train(x = training1[, 1:32],
                ntree = 250,
                prox = TRUE,
                allowParallel = TRUE)
+rfFit$finalModel
 ```
 
 ### Random forest history and reference

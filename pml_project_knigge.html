@@ -161,7 +161,23 @@ rfFit &lt;- train(x = training1[, 1:32],
                                          number = 5),
                ntree = 250,
                prox = TRUE,
-               allowParallel = TRUE)</code></pre>
+               allowParallel = TRUE)
+rfFit$finalModel</code></pre>
+<pre><code>## 
+## Call:
+##  randomForest(x = x, y = y, ntree = 250, mtry = param$mtry, proximity = TRUE,      data = ..1, allowParallel = TRUE) 
+##                Type of random forest: classification
+##                      Number of trees: 250
+## No. of variables tried at each split: 2
+## 
+##         OOB estimate of  error rate: 0.87%
+## Confusion matrix:
+##      A    B    C    D    E class.error
+## A 3898    2    4    2    0 0.002048131
+## B   18 2631    8    0    1 0.010158014
+## C    1   17 2368   10    0 0.011686144
+## D    0    1   40 2211    0 0.018206039
+## E    1    0    5   10 2509 0.006336634</code></pre>
 <div id="random-forest-history-and-reference" class="section level3">
 <h3>Random forest history and reference</h3>
 <p>Random forests popularity are primarily due to Leo Breiman (2001), who used the approach as an alternative to bagged trees in order to avoid increased variance due to correlated trees. Refer to Chapter 15 of <em>ESL</em> for a detailed yet clear discussion on random forests.</p>
