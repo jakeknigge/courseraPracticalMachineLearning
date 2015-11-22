@@ -1,11 +1,6 @@
----
-title: 'Random forests and barbells: Tree-based prediction of exercise quality'
-author: "Jake W. Knigge"
-date: "November 21, 2015"
-output: 
-  html_document: 
-    keep_md: yes
----
+# Random forests and barbells: Tree-based prediction of exercise quality
+Jake W. Knigge  
+November 21, 2015  
 
 # Overview and background
 
@@ -21,7 +16,8 @@ The data were obtained from Ugulino et. al. at: [groupware.les.inf.puc-rio.br/ha
 
 In this section, we provide the details and supporting code used to develop an "exercise quality"" prediction model.  The first chunk of code loads the necessary packages for producing the analysis.
 
-```{r, echo = TRUE, message = FALSE}
+
+```r
 require(ggplot2)
 require(dplyr)
 require(caret)
@@ -32,7 +28,8 @@ require(randomForest)
 
 Note, we assume that the data files are located within R's working directory.  The data are read in from the csv file and then converted to numeric data types (where appropriate).
 
-```{r, echo = TRUE, cache = TRUE, message = FALSE, cache.lazy = TRUE, warning = FALSE}
+
+```r
 # Read in human activity recognition data
 pml_df <- read.csv("pml-training.csv", stringsAsFactors = FALSE)
 
@@ -44,7 +41,8 @@ pml_df[, 8:159] <- sapply(pml_df[, 8:159], as.numeric)
 
 We first identify variables with high "NA" counts to reduce the number of covariates.  This process eliminates a number of "summary" variables (e.g., maximums, minimums, averages, standard deviations, etc.), which should be captured in the underlying "raw data".  After pruning the large number of "NA" variables, we further eliminate the remaining summary variables and select raw variables as indicated by the `gyros`, `accel`, `pitch`, `yaw`, and`roll` prefix.  Thirty-two covariates remain after pruning the initial data set; the remaining covariates were combined with the response variable to create a data frame to train the model.
 
-```{r, echo = TRUE, cache = TRUE, message = FALSE, cache.lazy = TRUE}
+
+```r
 # Determine where the NAs "live"
 zero_vars <- colSums(is.na(pml_df[,8:159]))
 quant_var_names <- names(pml_df[,8:159])
@@ -53,7 +51,30 @@ quant_var_names <- names(pml_df[,8:159])
 exclude_var <- which(zero_vars > 0)
 # Output the first round of selected variables
 quant_var_names[-exclude_var]
+```
 
+```
+##  [1] "roll_belt"            "pitch_belt"           "yaw_belt"            
+##  [4] "total_accel_belt"     "gyros_belt_x"         "gyros_belt_y"        
+##  [7] "gyros_belt_z"         "accel_belt_x"         "accel_belt_y"        
+## [10] "accel_belt_z"         "magnet_belt_x"        "magnet_belt_y"       
+## [13] "magnet_belt_z"        "roll_arm"             "pitch_arm"           
+## [16] "yaw_arm"              "total_accel_arm"      "gyros_arm_x"         
+## [19] "gyros_arm_y"          "gyros_arm_z"          "accel_arm_x"         
+## [22] "accel_arm_y"          "accel_arm_z"          "magnet_arm_x"        
+## [25] "magnet_arm_y"         "magnet_arm_z"         "roll_dumbbell"       
+## [28] "pitch_dumbbell"       "yaw_dumbbell"         "total_accel_dumbbell"
+## [31] "gyros_dumbbell_x"     "gyros_dumbbell_y"     "gyros_dumbbell_z"    
+## [34] "accel_dumbbell_x"     "accel_dumbbell_y"     "accel_dumbbell_z"    
+## [37] "magnet_dumbbell_x"    "magnet_dumbbell_y"    "magnet_dumbbell_z"   
+## [40] "roll_forearm"         "pitch_forearm"        "yaw_forearm"         
+## [43] "total_accel_forearm"  "gyros_forearm_x"      "gyros_forearm_y"     
+## [46] "gyros_forearm_z"      "accel_forearm_x"      "accel_forearm_y"     
+## [49] "accel_forearm_z"      "magnet_forearm_x"     "magnet_forearm_y"    
+## [52] "magnet_forearm_z"
+```
+
+```r
 # Based on the variables output above, further eliminate
 #     variables that appear to be summaries of other
 #     variables 
@@ -76,7 +97,8 @@ We use random forests to classify the exercise class.  Random forest have the in
 
 To allow for reproducibility, we set the random number seed (using the `set.seed()` function) before splitting our data set into a training and cross validation and before fitting the random forest model.  We supply additional training control arguments before fitting the model to reduce the time to fit the model: e.g., number of trees, number of cross-validation folds, parallel processing, etc.
 
-```{r, echo = TRUE, cache = TRUE, message = FALSE, cache.lazy = TRUE}
+
+```r
 # Set seed for reproducibility
 set.seed(111)
 
@@ -110,25 +132,32 @@ Random forests popularity are primarily due to Leo Breiman (2001), who used the 
 
 Per Hastie et. al. in *The Elements of Statistical Learning* (*ESL*), variable importance is an informative model diagnostic for random forests.  Variable importance measures "the improvement in the split-criterion" for each split in each classification tree (*ESL* p. 593).  In a Breiman-esque fashion, the improvements are aggregated across all trees in the forest for each variable.  Thus, a splitting variable that accumulates many split improvements will have a higher (relative) importance.  Note, the variable importance metrics shown below have been scaled so that the most important variable has an importance of 100.
 
-```{r, echo = TRUE, cache = TRUE, message = FALSE, cache.lazy = TRUE}
+
+```r
 # Plot the top twenty "importance factors"
 rfImp <- varImp(rfFit)
 plot(rfImp, top = 20)
 ```
 
+![](pml_project_knigge_files/figure-html/unnamed-chunk-5-1.png) 
+
 Consistent with the above information on variable importance, the below box plot shows that the `roll_belt` variable explains considerable variance in exercise `classe` variable.  The plot is colored according to the second-most important factor, which is the `pitch_forearm` variable.
 
-```{r, echo = TRUE, cache = TRUE, message = FALSE, cache.lazy = TRUE}
+
+```r
 qplot(x = classe, y = roll_belt, data = pml_df,
       color = pitch_forearm, geom = c("boxplot", "jitter"),
       main = "Roll-belt measurements explain variance in exercises")
 ```
 
+![](pml_project_knigge_files/figure-html/unnamed-chunk-6-1.png) 
+
 ## Cross-validation predictions
 
 We apply the model to the cross-validation set to gain a sense of the model's predictive power.  A confusion matrix shows the model's predictions versus the actual exercise classes.
 
-```{r, echo = TRUE, cache = TRUE, message = FALSE, cache.lazy = TRUE}
+
+```r
 # Cross validation
 cv_pred <- predict(rfFit, cvSet)
 
@@ -136,9 +165,44 @@ cv_pred <- predict(rfFit, cvSet)
 confusionMatrix(table(cv_pred, cvSet$classe))
 ```
 
+```
+## Confusion Matrix and Statistics
+## 
+##        
+## cv_pred    A    B    C    D    E
+##       A 1670    3    1    2    0
+##       B    2 1130    5    0    0
+##       C    1    6 1017   24    0
+##       D    1    0    3  937    5
+##       E    0    0    0    1 1077
+## 
+## Overall Statistics
+##                                          
+##                Accuracy : 0.9908         
+##                  95% CI : (0.988, 0.9931)
+##     No Information Rate : 0.2845         
+##     P-Value [Acc > NIR] : < 2.2e-16      
+##                                          
+##                   Kappa : 0.9884         
+##  Mcnemar's Test P-Value : NA             
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            0.9976   0.9921   0.9912   0.9720   0.9954
+## Specificity            0.9986   0.9985   0.9936   0.9982   0.9998
+## Pos Pred Value         0.9964   0.9938   0.9704   0.9905   0.9991
+## Neg Pred Value         0.9990   0.9981   0.9981   0.9945   0.9990
+## Prevalence             0.2845   0.1935   0.1743   0.1638   0.1839
+## Detection Rate         0.2838   0.1920   0.1728   0.1592   0.1830
+## Detection Prevalence   0.2848   0.1932   0.1781   0.1607   0.1832
+## Balanced Accuracy      0.9981   0.9953   0.9924   0.9851   0.9976
+```
+
 The confusion matrix and related statistics demonstrate the predictive power of the random forest on an unseen data set.  As is typical, the accuracy, specificity, and sensitivity decreased relative to the training set; however, the metrics indicate that the model is robust with respect to new data.
 
-```{r, echo = TRUE, cache = TRUE, message = FALSE, cache.lazy = TRUE}
+
+```r
 # Create comparison data frame
 cv_comp <- data.frame(cvSet$classe, cv_pred, cvSet$classe == cv_pred)
 names(cv_comp) <- c("Actual_class", "Predicted_class", "Agreement")
@@ -146,6 +210,8 @@ names(cv_comp) <- c("Actual_class", "Predicted_class", "Agreement")
 qplot(x = Actual_class, y = Predicted_class, 
       data = cv_comp, geom = c("point", "jitter"), color = Agreement)
 ```
+
+![](pml_project_knigge_files/figure-html/unnamed-chunk-8-1.png) 
 
 The above plot helps us visualize the confusion matrix and colors the misclassified exercises.  Note that the actual activity is on the x-axis and the predicted activity is on the y-axis.
 
@@ -156,12 +222,47 @@ This section describes various error measures and culminates with an estimate on
 ## Training set error
 We fit the random forest model using 70% of the data measurements, leaving 30% for cross-validation.  The model had an accuracy of 100% with a 95% confidence from `(0.9997, 1)` on the training set.  The error was 0% on the training set.
 
-```{r, echo = TRUE, cache = TRUE, message = FALSE, cache.lazy = TRUE}
+
+```r
 # Predict exercise class for training set
 training_pred <- predict(rfFit, training1)
 
 # Compare predictions to actuals and summarize in a confusion matrix
 confusionMatrix(table(training_pred, training1$classe))
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##              
+## training_pred    A    B    C    D    E
+##             A 3906    0    0    0    0
+##             B    0 2658    0    0    0
+##             C    0    0 2396    0    0
+##             D    0    0    0 2252    0
+##             E    0    0    0    0 2525
+## 
+## Overall Statistics
+##                                      
+##                Accuracy : 1          
+##                  95% CI : (0.9997, 1)
+##     No Information Rate : 0.2843     
+##     P-Value [Acc > NIR] : < 2.2e-16  
+##                                      
+##                   Kappa : 1          
+##  Mcnemar's Test P-Value : NA         
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            1.0000   1.0000   1.0000   1.0000   1.0000
+## Specificity            1.0000   1.0000   1.0000   1.0000   1.0000
+## Pos Pred Value         1.0000   1.0000   1.0000   1.0000   1.0000
+## Neg Pred Value         1.0000   1.0000   1.0000   1.0000   1.0000
+## Prevalence             0.2843   0.1935   0.1744   0.1639   0.1838
+## Detection Rate         0.2843   0.1935   0.1744   0.1639   0.1838
+## Detection Prevalence   0.2843   0.1935   0.1744   0.1639   0.1838
+## Balanced Accuracy      1.0000   1.0000   1.0000   1.0000   1.0000
 ```
 
 ### Out-of-bag training set error
@@ -180,7 +281,8 @@ Given that the training error (also referred to as the in-sample error) is typic
 
 Conservatively, we can lower-bound the error as the maximum of the training set error, OOB error, and cross-validation error: 0.95%.  In addition, we can add the expected optimism (as defined by Hastie et. al. in *ESL* on page 229).  The below chunk computes the expected optimism.
 
-```{r, echo = TRUE, cache = TRUE, message = FALSE, cache.lazy = TRUE}
+
+```r
 # Convert to dummy variables
 num_training_pred <- as.numeric(training_pred)
 
@@ -199,7 +301,8 @@ The cross-validation error plus the expected optimism of `0.03169`, brings the e
 
 Now, we demonstrate how to use the fitted random forest to predict on the (held out) test set.  Again, the data are assumed to reside within R's working directory.  First, we manipulate the data so it can be fed into the fitted model.
 
-```{r, echo = TRUE, cache = TRUE, message = FALSE, cache.lazy = TRUE}
+
+```r
 # Read in human activity recognition data
 pml_test_df <- read.csv("pml-testing.csv", stringsAsFactors = FALSE)
 
