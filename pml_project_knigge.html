@@ -73,11 +73,11 @@ img {
 <p>The era is the computable-self (or “quantified self”) has taken hold in a number of communities, some “techie” and others mainstream. Indeed, Stephen Wolfram (of <em>Mathematica</em> and <em>Wolfram Alpha</em> fame) has a blog post on “The Personal Analytics of My Life” where he steps through his email, keystroke, event, phone-call, and step (i.e., pedometer) data. His post can be found here: <a href="http://blog.stephenwolfram.com/2012/03/the-personal-analytics-of-my-life/">blog.stephenwolfram.com</a>.</p>
 <p>The fitness community has embraced the notion of the computable-self “using devices such as <em>Jawbone Up</em>, <em>Nike FuelBand</em>, <em>Fitbit</em>,” and the <em>Apple Watch</em>, which are minimally intrusive to the wearer and provide low-cost data. For example, <em>Fitbit</em> provides its wearers with pedometer, steps-climbed, and heart-rate data. Thus far, it appears that the fitness community has focused on quantity rather than quality.</p>
 <p>In this analysis, we use data from multiple accelerometers (located on the belt, forearm, arm, and dumbbell) from six participants to predict the quality (i.e., correctness) of the exercise performed. The participants performed barbell lifts in 5 different ways, some correctly and some incorrectly.</p>
-<p>The data were obtained from Ugulino et. al. at: <a href="http://groupware.les.inf.puc-rio.br/har">groupware.les.inf.puc-rio.br/har</a>.</p>
+<p>The data were obtained from Ugulino et. al. at: <a href="http://groupware.les.inf.puc-rio.br/har">groupware.les.inf.puc-rio.br/har</a>. The authors note: “Six young health participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E).”</p>
 </div>
 <div id="the-data-analytic-process" class="section level1">
 <h1>The data analytic process</h1>
-<p>In this section, we provide the details and supporting code used to develop an “exercise quality”&quot; prediction model. The first chunk of code loads the necessary packages for producing the analysis.</p>
+<p>In this section, we provide the details and supporting code used to develop an “exercise quality”&quot; prediction model based on random forests. The first chunk of code loads the necessary packages for producing the analysis.</p>
 <pre class="r"><code>require(ggplot2)
 require(dplyr)
 require(caret)

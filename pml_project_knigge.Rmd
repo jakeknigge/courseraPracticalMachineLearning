@@ -15,11 +15,11 @@ The fitness community has embraced the notion of the computable-self "using devi
 
 In this analysis, we use data from multiple accelerometers (located on the belt, forearm, arm, and dumbbell) from six participants to predict the quality (i.e., correctness) of the exercise performed.  The participants performed barbell lifts in 5 different ways, some correctly and some incorrectly.
 
-The data were obtained from Ugulino et. al. at: [groupware.les.inf.puc-rio.br/har](http://groupware.les.inf.puc-rio.br/har).
+The data were obtained from Ugulino et. al. at: [groupware.les.inf.puc-rio.br/har](http://groupware.les.inf.puc-rio.br/har).  The authors note: "Six young health participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E)."
 
 # The data analytic process
 
-In this section, we provide the details and supporting code used to develop an "exercise quality"" prediction model.  The first chunk of code loads the necessary packages for producing the analysis.
+In this section, we provide the details and supporting code used to develop an "exercise quality"" prediction model based on random forests.  The first chunk of code loads the necessary packages for producing the analysis.
 
 ```{r, echo = TRUE, message = FALSE}
 require(ggplot2)
